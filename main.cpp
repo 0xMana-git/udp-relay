@@ -39,6 +39,8 @@ std::unordered_map<uint64, sockaddr_in> peers;
 
 void add_peer(uint64 id, const sockaddr_in& peer_sock) {
     std::lock_guard lock(peers_lock);
+    //there really is no point keeping
+    peers.erase(id);
     peers.emplace(id, peer_sock);
 }
 
