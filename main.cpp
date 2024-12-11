@@ -16,8 +16,17 @@
 using uint64 = unsigned long long;
 using byte = unsigned char;
 
+enum MESSAGE_TYPE : byte {
+    GET_PEERLIST = 0,
+    RELAY_PACKET = 1
+};
+
+
 
 constexpr size_t buf_size = 65536;
+struct UDPPacket {
+    MESSAGE_TYPE type;
+}
 //udp port
 constexpr int RELAY_PORT = 16969;
 inline static char packet_buffer[buf_size]; 
@@ -52,11 +61,6 @@ const sockaddr_in* find_peer(uint64 id) {
     return &(it->second);
 }
 
-
-enum MESSAGE_TYPE : byte {
-    GET_PEERLIST = 0,
-    RELAY_PACKET = 1
-};
 
 
 
@@ -112,7 +116,7 @@ int main() {
         //TODO: add authentication for client
 
         
-        //std::cout << "sender uid - " << src_uid << " host:port - " << sockaddr_to_hostport(cliaddr) << " payload size " << n << std::endl;
+        std::cout << "sender uid - " << src_uid << " host:port - " << sockaddr_to_hostport(cliaddr) << " payload size " << n << std::endl;
         //add to list of peers
         add_peer(src_uid, cliaddr);
         //drop packet if not relaying
@@ -124,7 +128,7 @@ int main() {
         //drop if didnt find peer
         if(send_addr == nullptr)
             continue;
-        //std::cout << "forwarding to uid: " << dst_uid << " host:port " << sockaddr_to_hostport(*send_addr) << std::endl;
+        std::cout << "forwarding to uid: " << dst_uid << " host:port " << sockaddr_to_hostport(*send_addr) << std::endl;
         //forward packet, send everything except dst + mode(redundant)
         int to_send_n = n - 5;
         char* pbuf = (char*)&packet_buffer;
