@@ -30,7 +30,7 @@ std::string addr_to_string(const in_addr& addr) {
 }
 
 std::string sockaddr_to_hostport(const sockaddr_in& addr) {
-    return addr_to_string(addr.sin_addr) + ":" + std::to_string(addr.sin_port);
+    return addr_to_string(addr.sin_addr) + ":" + std::to_string(ntohs(addr.sin_port));
 }
 
 std::mutex peers_lock;
