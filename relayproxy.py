@@ -87,7 +87,10 @@ def main():
 
     print(f"Proxy server is ready. Client can now bind to port {port}")
     while True:
-        time.sleep(1000)
+        #sure i could make a ondispatch hook but im lazy
+        relay_client.send_packet(client.GET_PEERLIST, b"")
+        time.sleep(4)
+        rebuild_dummies(("0.0.0.0", port), dummies, relay_client.peers, port, relay_client)
 
 
 if __name__ == "__main__":

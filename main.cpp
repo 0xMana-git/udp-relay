@@ -292,7 +292,7 @@ int main() {
     socklen_t len;
     int n; 
 
-    std::cerr << "Server starting..." << std::endl;
+    std::cout << "Server starting..." << std::endl;
     //multithread shouldnt be a need...yet
 
     while(true) {
