@@ -27,6 +27,8 @@ def parse_peers(packet : bytes):
     res = []
     for i in range(0, len(packet), 4):
         res.append(int.from_bytes(packet[i:i+4], "little"))
+    dbgprint("PEERS")
+    dbgprint(res)
     return res
 def encode_u32(v : int) -> bytes:
     return v.to_bytes(4, "little")
@@ -34,7 +36,6 @@ def encode_u32(v : int) -> bytes:
 def print_relay(packet : bytes):
     
     print(f"Recieved {packet[4:].decode()} @ {int.from_bytes(packet[:4], "little")}")
-    dbgprint(packet)
 
 
 class RelayClient:
@@ -70,7 +71,7 @@ class RelayClient:
             case 3:
                 pass
             case _:
-                pass
+                print("Invalid packet from server!")
     
     def recv_loop(self):
         while True:

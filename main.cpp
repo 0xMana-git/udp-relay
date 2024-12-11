@@ -104,7 +104,8 @@ struct ServerPacket : public PacketBase {
         for(size_t i = 0; i < peer_ids.size(); i++) {
             peer_data[i] = peer_ids[i];
         }
-        size = peer_ids.size() + sizeof(PacketBase);
+        type = GET_PEERLIST;
+        size = peer_ids.size() * sizeof(id_t) + sizeof(PacketBase);
 
     }
     ServerPacket(const ClientPacket& relaySource) {

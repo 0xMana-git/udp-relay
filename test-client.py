@@ -22,6 +22,7 @@ def main():
     c.start_recv_thread()
     while True:
         c.relay_to(int(input("relay to: ")), input("payload: ").encode())
+        c.send_packet(client.GET_PEERLIST, b"")
 
 
 
