@@ -11,22 +11,57 @@
 #include <unordered_set>
 #include <mutex>
 #include <thread>
+#include <cstdint>
 
 
 using uint64 = unsigned long long;
 using byte = unsigned char;
 
+using id_t = unsigned int32_t;
+
 enum MESSAGE_TYPE : byte {
     GET_PEERLIST = 0,
-    RELAY_PACKET = 1
+    RELAY_PACKET = 1,
+    REGISTER_ID = 2,
+    UNREGISTER_ID = 3
 };
 
 
-
+//MAXIMUM size, not necessarily actual packet size
 constexpr size_t buf_size = 65536;
-struct UDPPacket {
+
+__attribute__((packed))
+struct ClientPacket {
     MESSAGE_TYPE type;
+
+    union {
+        //GetPeerlist 
+        char[buf_size - 1] pad;
+        //RelayPacket
+        struct {
+            id_t dst, src;
+            char[buf_size - 1 - 4 * 2] content;
+        };
+        //RegisterID/UnregisterID
+        struct {
+            id_t reg_id;
+            char[buf_size - 1 - 4] pad;
+        }
+        
+    }
 };
+
+int a = sizeof(ClientPacket);
+struct SockData {
+    sockaddr_in sock = {0};
+    int sockfd = 0;
+    int send(byte* packet, int size) {
+        return sendto(sockfd, packet, size, 0, (sockaddr*)&sock, sizeof(sock));
+    }
+};
+
+
+
 //udp port
 constexpr int RELAY_PORT = 16969;
 inline static char packet_buffer[buf_size]; 
@@ -44,16 +79,16 @@ std::string sockaddr_to_hostport(const sockaddr_in& addr) {
 
 std::mutex peers_lock;
 
-std::unordered_map<uint64, sockaddr_in> peers;
+std::unordered_map<uint64, SockData> peers;
 
-void add_peer(uint64 id, const sockaddr_in& peer_sock) {
+void add_peer(uint64 id, const SockData& peer_sock) {
     std::lock_guard lock(peers_lock);
     //there really is no point keeping
     peers.erase(id);
     peers.emplace(id, peer_sock);
 }
 
-const sockaddr_in* find_peer(uint64 id) {
+const SockData* find_peer(uint64 id) {
     std::lock_guard lock(peers_lock);
     auto it = peers.find(id);
     if(it == peers.end())
@@ -61,8 +96,33 @@ const sockaddr_in* find_peer(uint64 id) {
     return &(it->second);
 }
 
+std::vector<id_t> get_peers() {
+    std::lock_guard lock(peers_lock);
+    std::vector<id_t> res;
+    for(const auto& it : peers) 
+        res.push_back(it->first);
+    
+    return res;
+}
 
 
+
+
+bool dispatch_message(const SockData& peer_sock, const ClientPacket& packet) {
+    switch(packet.type) {
+        case GET_PEERLIST:
+            auto peers_vec = get_peers();
+            int n = peer_sock.send(peers_vec.data(), peers_vec.size() * sizeof(id_t));
+            return n == peers_vec.size() * sizeof(id_t);
+        case RELAY_PACKET:
+        case REGISTER_ID:
+        case UNREGISTER_ID:
+
+
+
+    }
+
+}
 
 int main() { 
     int sockfd; 
