@@ -11,11 +11,6 @@ SRC_PORT = None
 src_id = int(sys.argv[1])
 
 
-def reverse_endianness(n : int) -> int:
-    return int.from_bytes(n.to_bytes(2), "little")
-
-
-
 
 
 def recv_loop(s : socket.socket):
@@ -44,7 +39,7 @@ def main():
     SRC_PORT = random.randint(40000, 65535)
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    sock.bind(("0.0.0.0", reverse_endianness(SRC_PORT)))
+    sock.bind(("0.0.0.0", SRC_PORT))
     #advertise
     #this packet will get dropped, but this peer will be recognized
     send_packet(sock, make_packet(0, b""))
