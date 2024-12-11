@@ -42,7 +42,7 @@ class ProxyClient:
             #if anything is sent to the dummies, forward them to the relay client
             pdata = self.sock.recvfrom(65535)
             print(pdata)
-            self.relay_client.relay_to(pdata[1][1], pdata[0])
+            self.relay_client.relay_to(pdata[1][1], self.port)
 
 
     def __del__(self):
@@ -74,7 +74,7 @@ def main():
             print("regisered {port}")
             break
         print("registration fail. retrying...")
-        start_port += 1
+        port += 1
     #once we get a valid client, we start to initialize the dummy proxies
     #hopefully this doesnt fuck things up
     peers = relay_client.get_peers()
@@ -85,7 +85,7 @@ def main():
     rebuild_dummies(("0.0.0.0", port), dummies, relay_client.peers, port, relay_client)
     relay_client.start_recv_thread()
 
-    print("Proxy server is ready. Client can now bind to port " + port)
+    print(f"Proxy server is ready. Client can now bind to port {port}")
     while True:
         time.sleep(1000)
 
