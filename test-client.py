@@ -15,8 +15,8 @@ src_id = int(sys.argv[1])
 
 def recv_loop(s : socket.socket):
     while(True):
-        data = s.recvfrom(65536)
-        print("Recieved: " + data[0][4:].decode())
+        data = s.recvfrom(65536)[0]
+        print("Recieved: " + data[4:].decode() + "@" + int.from_bytes(data[:4], byteorder="little"))
 
 def send_packet(sock : socket.socket, payload : bytes):
     sock.sendto(payload, (RELAY_HOST, RELAY_PORT))
