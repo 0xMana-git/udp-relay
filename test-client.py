@@ -9,7 +9,6 @@ SRC_PORT = None
 
 
 src_id = int(sys.argv[1])
-dest_id = int(sys.argv[2])
 
 
 def reverse_endianness(n : int) -> int:
@@ -52,7 +51,7 @@ def main():
     #now send/recv fr
     threading.Thread(target=recv_loop, args=(sock,),daemon=True).start()
     while True:
-        send_packet(sock, make_packet(dest_id, input("payload: ").encode()))
+        send_packet(sock, make_packet(input("target id: "), input("payload: ").encode()))
 
 
 
