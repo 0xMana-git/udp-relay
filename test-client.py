@@ -46,7 +46,7 @@ def main():
     #now send/recv fr
     threading.Thread(target=recv_loop, args=(sock,),daemon=True).start()
     while True:
-        send_packet(sock, make_packet(input("target id: "), input("payload: ").encode()))
+        send_packet(sock, make_packet(int(input("target id: ")), input("payload: ").encode()))
 
 
 
