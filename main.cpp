@@ -26,7 +26,7 @@ enum MESSAGE_TYPE : byte {
 constexpr size_t buf_size = 65536;
 struct UDPPacket {
     MESSAGE_TYPE type;
-}
+};
 //udp port
 constexpr int RELAY_PORT = 16969;
 inline static char packet_buffer[buf_size]; 
