@@ -42,7 +42,7 @@ class ProxyClient:
             #if anything is sent to the dummies, forward them to the relay client
             pdata = self.sock.recvfrom(65535)
             print(pdata)
-            self.relay_client.relay_to(pdata[1][1], self.port)
+            self.relay_client.relay_to(self.port, pdata[0])
 
 
     def __del__(self):
