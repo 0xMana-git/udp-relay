@@ -126,6 +126,7 @@ class RelayClient:
         self.client_host = "0.0.0.0" if client_host == None else client_host
         self.client_port = random.randint(40000, 65535) if client_port == None else client_port
         self.init_sock()
+        self.peers = []
         self.valid = False
         dbgprint(f"Registering id {id}" )
         if self.register():
