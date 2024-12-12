@@ -224,41 +224,45 @@ bool send_peerdata(const SockData& peer_sock) {
     
 }
 
-bool dispatch_message(const SockData& peer_sock, const ClientPacket& packet) {
+bool dispatch_message(const SockData& peer_sock, const ClientPacket& packet) noexcept {
     bool success;
     dbgcerr << "packet type " << (int)packet.type << std::endl;
-    switch(packet.type) {
-        case GET_PEERLIST:
-            return send_peerdata(peer_sock);
-        case RELAY_PACKET:
-            if(auto peer = find_peer(packet.reg_id); peer != nullptr) {
-                return peer->send_check(ServerPacket(packet));
-            }
-            return false;
-        case REGISTER_ID:
-        dbgcerr << "registering " << (int)packet.reg_id << std::endl;
-            if(find_peer(packet.reg_id) == nullptr){
-                add_peer(packet.reg_id, peer_sock);
-                dbgcerr << "peer added. sending response..." << std::endl;
-                return peer_sock.send_check(ServerPacket(true, true));
-            }
-            dbgcerr << "peer already exists. sending fail response..." << std::endl;
-            return peer_sock.send_check(ServerPacket(true, false));
-                
-        case UNREGISTER_ID:
-            if(find_peer(packet.reg_id) != nullptr){
-                remove_peer(packet.reg_id);
-                return peer_sock.send_check(ServerPacket(false, true));
-            }
-            return peer_sock.send_check(ServerPacket(false, false));
+    try {
+        switch(packet.type) {
+            case GET_PEERLIST:
+                return send_peerdata(peer_sock);
+            case RELAY_PACKET:
+                if(auto peer = find_peer(packet.reg_id); peer != nullptr) {
+                    return peer->send_check(ServerPacket(packet));
+                }
+                return false;
+            case REGISTER_ID:
+            dbgcerr << "registering " << (int)packet.reg_id << std::endl;
+                if(find_peer(packet.reg_id) == nullptr){
+                    add_peer(packet.reg_id, peer_sock);
+                    dbgcerr << "peer added. sending response..." << std::endl;
+                    return peer_sock.send_check(ServerPacket(true, true));
+                }
+                dbgcerr << "peer already exists. sending fail response..." << std::endl;
+                return peer_sock.send_check(ServerPacket(true, false));
+                    
+            case UNREGISTER_ID:
+                if(find_peer(packet.reg_id) != nullptr){
+                    remove_peer(packet.reg_id);
+                    return peer_sock.send_check(ServerPacket(false, true));
+                }
+                return peer_sock.send_check(ServerPacket(false, false));
 
-        //drop
-        default:
-            return true;
-
+            //drop
+            default:
+                return true;
+        }
 
     }
-
+    catch( std::exception& e) {
+        dbgcerr << "Encounted exception while dispatching: " << e.what() << std::endl;
+        return 0;
+    }
 }
 
 int main() { 
