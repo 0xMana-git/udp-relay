@@ -113,7 +113,9 @@ class RelayClient:
         self.send_packet(GET_PEERLIST, b"")
         packet = self.recv_packet_raw()
         assert(get_msg(packet) == GET_PEERLIST)
-        return parse_peers(get_headerless(packet))
+        self.peers = parse_peers(get_headerless(packet))
+        self.on_peerlist_update(self.peers)
+        return self.peers
     
 
 
