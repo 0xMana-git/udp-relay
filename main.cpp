@@ -148,7 +148,7 @@ struct SockData {
     int sockfd = 0;
     int send(const ServerPacket& packet) const {
         if(packet.size > buf_size) {
-            throw std::runtime_error("invalid packet size(too large)");
+            throw std::runtime_error("invalid packet size when sending(too large)");
         }
         return sendto(sockfd, &packet, packet.size, 0, (sockaddr*)&sock, sizeof(sock));
     }
