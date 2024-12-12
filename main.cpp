@@ -100,7 +100,7 @@ struct ServerPacket : public PacketBase {
     } __attribute__((packed));;
     //Peer index constructor
     ServerPacket(const std::vector<id_t>& peer_ids) {
-        assert(peer_ids.size() < max_peers);
+        assert(peer_ids.size() <= max_peers);
         for(size_t i = 0; i < peer_ids.size(); i++) {
             peer_data[i] = peer_ids[i];
         }
