@@ -66,7 +66,7 @@ def queue_up_relay(packet : bytes):
 
 
 def main():
-    start_port = 8760
+    start_port = 8720
     port = start_port
     while True:
         relay_client = client.RelayClient(RELAY_HOST, RELAY_PORT, port)
