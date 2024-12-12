@@ -26,7 +26,7 @@ def parse_peers(packet : bytes):
     assert(len(packet) % 4 == 0)
     res = []
     for i in range(0, len(packet), 4):
-        res.append(encode_u32(packet[i:i+4]))
+        res.append(decode_u32(packet[i:i+4]))
     dbgprint("PEERS")
     dbgprint(res)
     return res
