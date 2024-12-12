@@ -109,14 +109,16 @@ struct ServerPacket : public PacketBase {
 
     }
     ServerPacket(const ClientPacket& relaySource) {
-        assert(relaySource.type == RELAY_PACKET);
+        if(relaySource.type != RELAY_PACKET)
+            throw std::runtime_error("type mismatch")
         type = RELAY_PACKET;
         //Size of this entire packet should be content + src + header
         //Which is equivalent to source size - dst
         size = relaySource.size - sizeof(relaySource.dst);
         size_t content_size = size - sizeof(PacketBase) - sizeof(src);
         //Make sure it actually fits in the buffer
-        assert(sizeof(content) >= content_size);
+        if(!(sizeof(content) >= content_size)) 
+            throw std::runtime_error("content size too large")
         memcpy(content, relaySource.content, content_size);
         this->src = relaySource.src;
     }
@@ -145,7 +147,9 @@ struct SockData {
     sockaddr_in sock = {0};
     int sockfd = 0;
     int send(const ServerPacket& packet) const {
-        assert(packet.size < buf_size);
+        if(packet.size > buf_size) {
+            throw std::runtime_error("invalid packet size(too large)");
+        }
         return sendto(sockfd, &packet, packet.size, 0, (sockaddr*)&sock, sizeof(sock));
     }
     bool send_check(const ServerPacket& packet) const {
