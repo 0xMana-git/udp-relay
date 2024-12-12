@@ -26,16 +26,19 @@ def parse_peers(packet : bytes):
     assert(len(packet) % 4 == 0)
     res = []
     for i in range(0, len(packet), 4):
-        res.append(int.from_bytes(packet[i:i+4], "little"))
+        res.append(encode_u32(packet[i:i+4]))
     dbgprint("PEERS")
     dbgprint(res)
     return res
 def encode_u32(v : int) -> bytes:
     return v.to_bytes(4, "little")
+#maybe its i32? idk
+def decode_u32(b : bytes) -> int:
+    return int.from_bytes(b, "little", signed=False)
 
 def print_relay(packet : bytes):
     
-    print(f"Recieved {packet[4:].decode()} @ {int.from_bytes(packet[:4], "little")}")
+    print(f"Recieved {packet[4:].decode()} @ {decode_u32(packet[:4])}")
 
 
 class RelayClient:
@@ -78,7 +81,7 @@ class RelayClient:
             self.dispatch_packet(self.recv_packet_raw())
 
     def register(self) -> bool:
-        self.send_packet(REGISTER_ID, self.id.to_bytes(4, "little"))
+        self.send_packet(REGISTER_ID, encode_u32(self.id))
         packet = self.recv_packet_raw()
         if get_msg(packet) != REGISTER_ID:
             return False
