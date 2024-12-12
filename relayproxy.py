@@ -82,7 +82,7 @@ def main():
     relay_client.dispatch_relay = queue_up_relay
     dummies = {}
     #maybe change this to 127.0.0.1
-    rebuild_dummies(("0.0.0.0", port), dummies, relay_client.peers, port, relay_client)
+    rebuild_dummies(("127.0.0.1", port), dummies, relay_client.peers, port, relay_client)
     relay_client.start_recv_thread()
 
     print(f"Proxy server is ready. Client can now bind to port {port}")
@@ -90,7 +90,7 @@ def main():
         #sure i could make a ondispatch hook but im lazy
         relay_client.send_packet(client.GET_PEERLIST, b"")
         time.sleep(4)
-        rebuild_dummies(("0.0.0.0", port), dummies, relay_client.peers, port, relay_client)
+        rebuild_dummies(("127.0.0.1", port), dummies, relay_client.peers, port, relay_client)
 
 
 if __name__ == "__main__":

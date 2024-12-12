@@ -27,8 +27,7 @@ def parse_peers(packet : bytes):
     res = []
     for i in range(0, len(packet), 4):
         res.append(decode_u32(packet[i:i+4]))
-    dbgprint("PEERS")
-    dbgprint(res)
+    dbgprint(f"Peers {str(res)}")
     return res
 def encode_u32(v : int) -> bytes:
     return v.to_bytes(4, "little")
