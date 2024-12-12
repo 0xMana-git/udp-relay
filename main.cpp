@@ -110,7 +110,7 @@ struct ServerPacket : public PacketBase {
     }
     ServerPacket(const ClientPacket& relaySource) {
         if(relaySource.type != RELAY_PACKET)
-            throw std::runtime_error("type mismatch")
+            throw std::runtime_error("type mismatch");
         type = RELAY_PACKET;
         //Size of this entire packet should be content + src + header
         //Which is equivalent to source size - dst
@@ -118,7 +118,7 @@ struct ServerPacket : public PacketBase {
         size_t content_size = size - sizeof(PacketBase) - sizeof(src);
         //Make sure it actually fits in the buffer
         if(!(sizeof(content) >= content_size)) 
-            throw std::runtime_error("content size too large")
+            throw std::runtime_error("content size too large");
         memcpy(content, relaySource.content, content_size);
         this->src = relaySource.src;
     }
