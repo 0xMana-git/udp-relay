@@ -27,8 +27,10 @@ def parse_peers(packet : bytes):
     res = []
     for i in range(0, len(packet), 4):
         res.append(decode_u32(packet[i:i+4]))
-    dbgprint(f"Peers {str(res)}")
     return res
+
+def print_peers(peers : list):
+    dbgprint(f"Peers {str(peers)}")
 def encode_u32(v : int) -> bytes:
     return v.to_bytes(4, "little")
 #maybe its i32? idk
@@ -56,6 +58,13 @@ class RelayClient:
     
     def recv_packet_raw(self):
         return self.sock.recvfrom(65535)[0]
+    
+    def dispatch_peerlist(self, packet : bytes):
+        tmp_peers = parse_peers(packet)
+        if self.peers == tmp_peers:
+            return
+        self.peers = tmp_peers
+        self.on_peerlist_update(self.peers)
 
     
 
@@ -64,10 +73,9 @@ class RelayClient:
         headerless = get_headerless(packet)
         match message:
             case 0:
-                self.peers = parse_peers(headerless)
+                self.dispatch_peerlist(headerless)
             case 1:
                 self.dispatch_relay(headerless)
-                pass
             case 2:
                 pass
             case 3:
@@ -122,6 +130,7 @@ class RelayClient:
             self.valid = True
         dbgprint(f"client host: {self.client_host}; port: {self.client_port}")
         self.dispatch_relay = print_relay
+        self.on_peerlist_update = print_peers
     def start_recv_thread(self):
         
         self.recv_thread = threading.Thread(target=self.recv_loop, daemon=True)
