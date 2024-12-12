@@ -76,7 +76,7 @@ def main():
     while True:
         relay_client = client.RelayClient(RELAY_HOST, RELAY_PORT, port)
         if relay_client.valid:
-            print("regisered {port}")
+            print(f"regisered {port}")
             break
         print("registration fail. retrying...")
         port += 1
