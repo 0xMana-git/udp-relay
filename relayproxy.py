@@ -7,7 +7,7 @@ import client
 import time
 import queue
 
-packet_queue = queue.Queue()
+packet_queue = {}
 
 RELAY_HOST = "127.0.0.1"
 RELAY_PORT = 16969
@@ -36,7 +36,9 @@ class ProxyClient:
         global packet_queue
         #if anything comes from the relay client, send
         while True:
-            self.sock.sendto(packet_queue.get(), self.target)
+            if not self.port in packet_queue.keys():
+                packet_queue[self.port] = queue.Queue()
+            self.sock.sendto(packet_queue[self.port].get(), self.target)
     def recv_loop(self):
         while True:
             #if anything is sent to the dummies, forward them to the relay client
@@ -62,7 +64,10 @@ def rebuild_dummies(target : tuple, dummies : dict, peers : list, this_port : in
 
 def queue_up_relay(packet : bytes):
     global packet_queue
-    packet_queue.put(packet[4:])
+    uid = client.decode_u32(packet[:4])
+    if not uid in packet_queue.keys():
+        packet_queue[uid] = queue.Queue()
+    packet_queue[uid].put(packet[4:])
 
 
 def main():
